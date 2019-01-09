@@ -8,24 +8,28 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use AppBundle\Service\InputValidator;
-use AppBundle\Entity\Message;
+use AppBundle\Service\MessageService;
 
 class DefaultController extends Controller
 {
     protected $response = array('status' => '', 'data' => '', 'message' => '');
+
     /**
      * @Route("/", name="homepage")
+     * @param Request $request
+     * @param MessageService $messageService
+     * @return JsonResponse
      */
-    public function indexAction(Request $request)
+    public function indexAction(Request $request, MessageService $messageService)
     {
         try{
+            $response = '';
             $inputValidator = new InputValidator();
-
             $Input = $inputValidator->validateInputMethod($request);
             if($Input) {
-                $this->processMessage($Input);
+                $response = $messageService->process($Input);
             }
-            return $this->sendResponse($this->response);
+            return $this->sendResponse($response);
         }
         catch(\Exception  $e){
             $this->response['status'] = 'error';
@@ -36,24 +40,6 @@ class DefaultController extends Controller
 
 
 
-    private function processMessage($data){
-        print_r($data);
-        $em = $this->getDoctrine()->getManager();
-
-        $newMsg = new Message();
-        $newMsg->setCreated(new \DateTime('now'));
-        $newMsg->setOriginator($data['originator']);
-        $newMsg->setRecipient($data['recipient']);
-        $newMsg->setMessage($data['message']);
-        $newMsg->setIsSent(false);
-        $em->persist($newMsg);
-        $em->flush();
-        $msg = $em->getRepository('AppBundle:Message')->findOneBy(array('isSent' => true), array('sentDate' => 'DESC'));
-        print_r($msg);
-        die();
-        $this->response['status'] = 'success';
-        $this->response['message'] = 'message have been sent';
-    }
     private function sendResponse($response){
 
         return new JsonResponse($response);
