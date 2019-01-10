@@ -12,15 +12,14 @@ use AppBundle\Service\MessageService;
 
 class DefaultController extends Controller
 {
-    protected $response = array('status' => '', 'data' => '', 'message' => '');
-
     /**
      * @Route("/", name="homepage")
      * @param Request $request
      * @param MessageService $messageService
+     *  @var MessageService $messageService
      * @return JsonResponse
      */
-    public function indexAction(Request $request, MessageService $messageService)
+    public function indexAction(Request $request)
     {
         try{
             $response = '';
@@ -29,19 +28,14 @@ class DefaultController extends Controller
             if($Input) {
                 $response = $messageService->process($Input);
             }
-            return $this->sendResponse($response);
         }
         catch(\Exception  $e){
-            $this->response['status'] = 'error';
-            $this->response['message'] = $e->getMessage();
-            return $this->sendResponse($this->response);
+            $response['status'] = 'error';
+            $response['data'] = '';
+            $response['message'] = $e->getMessage();
         }
-    }
-
-
-
-    private function sendResponse($response){
-
         return new JsonResponse($response);
     }
+
+
 }

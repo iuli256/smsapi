@@ -63,6 +63,12 @@ class Message
      */
     private $sentDate;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="response", type="string", length=255, nullable=true)
+     */
+    private $response;
 
     /**
      * Get id
@@ -216,6 +222,31 @@ class Message
     public function getSentDate()
     {
         return $this->sentDate;
+    }
+
+
+    /**
+     * Set response
+     *
+     * @param string $response
+     *
+     * @return Message
+     */
+    public function setResponse($response)
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * Get response
+     *
+     * @return string
+     */
+    public function getResponse()
+    {
+        return $this->response;
     }
 }
 
