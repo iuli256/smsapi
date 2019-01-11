@@ -16,13 +16,14 @@ class DefaultController extends Controller
      * @Route("/", name="homepage")
      * @param Request $request
      * @param MessageService $messageService
-     *  @var MessageService $messageService
-     * @return JsonResponse
+      * @return JsonResponse
      */
     public function indexAction(Request $request)
     {
+        $response = array();
         try{
-            $response = '';
+            /*  @var MessageService $messageService */
+            $messageService = $this->get('message.custom');
             $inputValidator = new InputValidator();
             $Input = $inputValidator->validateInputMethod($request);
             if($Input) {
@@ -37,5 +38,20 @@ class DefaultController extends Controller
         return new JsonResponse($response);
     }
 
+    /**
+     * @Route("/cron/", name="cron")
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function cronAction(Request $request){
+        $response = array();
+        try{
 
+        }catch (\Exception $e){
+            $response['status'] = 'error';
+            $response['data'] = '';
+            $response['message'] = $e->getMessage();
+        }
+        return new JsonResponse($response);
+    }
 }

@@ -22,6 +22,15 @@ class MessageService
         date_default_timezone_set("Europe/Bucharest");
     }
 
+    public function cron(){
+        $data['date'] = new \DateTime('now');
+        $lastSendDate = $this->getLastMessageSendDate();
+        $lastUnsentMessage = $this->getLastUnsentMessage();
+        $dif = $data['date']->getTimestamp() - $lastSendDate->getTimestamp();
+        if ($dif >= 1){
+            $this->sendMessage($data);
+        }
+    }
     public function process($data){
         $data['date'] = new \DateTime('now');
         $data['id'] = $this->saveMessage($data);
@@ -85,5 +94,11 @@ class MessageService
         $em = $this->doctrine->getManager();
         $msg = $em->getRepository('AppBundle:Message')->findOneBy(array('isSent' => true), array('sentDate' => 'DESC'));
         return $msg->getSentDate();
+    }
+
+    private function getLastUnsentMessage(){
+        $em = $this->doctrine->getManager();
+        $msg = $em->getRepository('AppBundle:Message')->findOneBy(array('isSent' => false), array('created' => 'ASC'));
+        return $msg->getId();
     }
 }
