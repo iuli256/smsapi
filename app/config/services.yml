@@ -32,3 +32,4 @@ services:
     # add more services, or override services that need manual wiring
     message.custom:
         class: AppBundle\Service\MessageService
+        public: true
