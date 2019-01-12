@@ -27,7 +27,8 @@ class DefaultController extends Controller
             $inputValidator = new InputValidator();
             $Input = $inputValidator->validateInputMethod($request);
             if($Input) {
-                $response = $messageService->process($Input);
+                $smskey = $this->getParameter('smskey');
+                $response = $messageService->process($Input, $smskey);
             }
         }
         catch(\Exception  $e){
@@ -46,6 +47,10 @@ class DefaultController extends Controller
     public function cronAction(Request $request){
         $response = array();
         try{
+            /*  @var MessageService $messageService */
+            $messageService = $this->get('message.custom');
+            $smskey = $this->getParameter('smskey');
+            $response = $messageService->cron($smskey);
 
         }catch (\Exception $e){
             $response['status'] = 'error';

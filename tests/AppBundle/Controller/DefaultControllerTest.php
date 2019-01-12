@@ -189,6 +189,8 @@ class DefaultControllerTest extends WebTestCase
             '{"recipient":"40723586983", "originator":"MessageBird", "message":"this is a test message"}');
 
         $this->assertEquals(200, $client->getResponse()->getStatusCode());
-        $this->assertContains('{"status":"success","data":"","message":"message have been sent"}', $client->getResponse()->getContent());
+        $resp = json_decode($client->getResponse()->getContent(), true);
+        $this->assertEquals("success", $resp['status']);
+        $this->assertEquals("message have been sent", $resp['message'] );
     }
 }
