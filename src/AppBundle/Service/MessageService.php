@@ -10,15 +10,38 @@ namespace AppBundle\Service;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use AppBundle\Entity\Message;
+use Monolog\Logger;
 
 class MessageService
 {
-    /** @var RegistryInterface */
-    private $doctrine;
+    /**
+     * @var \Doctrine\Bundle\DoctrineBundle\Registry
+     */
+    protected $doctrine;
 
-    public function __construct(RegistryInterface $doctrine)
+    /**
+     * @var SrnLoggerService
+     */
+    protected $logger;
+
+    public function setDoctrine($doctrine)
     {
         $this->doctrine = $doctrine;
+        return $this;
+    }
+
+    /**
+     * @param SrnLoggerService $logger
+     * @return AvailableStockService
+     */
+    public function setLogger(SrnLoggerService $logger): AvailableStockService
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+    public function __construct(RegistryInterface $doctrine)
+    {
+       // $this->doctrine = $doctrine;
         date_default_timezone_set("Europe/Bucharest");
     }
 
@@ -78,14 +101,19 @@ class MessageService
     }
 
     private function saveMessage($data){
-        $newMsg = new Message();
-        $newMsg->setCreated($data['date']);
-        $newMsg->setOriginator($data['originator']);
-        $newMsg->setRecipient($data['recipient']);
-        $newMsg->setMessage($data['message']);
-        $newMsg->setIsSent(false);
-        $em = $this->doctrine->getManager();
-        $em->persist($newMsg);
+        try{
+            $newMsg = new Message();
+            $newMsg->setCreated($data['date']);
+            $newMsg->setOriginator($data['originator']);
+            $newMsg->setRecipient($data['recipient']);
+            $newMsg->setMessage($data['message']);
+            $newMsg->setIsSent(false);
+            $em = $this->doctrine->getManager();
+            $em->persist($newMsg);
+
+        }catch (\Exception $e){
+
+        }
         $em->flush();
         return $newMsg->getId();
     }
